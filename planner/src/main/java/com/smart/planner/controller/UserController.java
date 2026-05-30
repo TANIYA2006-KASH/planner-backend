@@ -28,13 +28,14 @@ public class UserController {
         }
     }
 
-    // 2. Endpoint: User Login Karne Ke Liye
+    // 2. Endpoint: User Login Karne Ke Liye (With Secure Password Matching)
     // URL: http://localhost:8080/api/users/login
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User loginDetails) {
         Optional<User> userOpt = userService.getUserByEmail(loginDetails.getEmail());
         
-        if (userOpt.isPresent() && userOpt.get().getPassword().equals(loginDetails.getPassword())) {
+        // Industry Standard: Plain password aur Encrypted password ko secure tarike se match kar rahe hain
+        if (userOpt.isPresent() && userService.checkPassword(loginDetails.getPassword(), userOpt.get().getPassword())) {
             return ResponseEntity.ok(userOpt.get()); // Login successful
         } else {
             return ResponseEntity.status(401).body("Invalid email or password!");
